@@ -1,0 +1,15 @@
+#import "./usersConnectionFragment.gql"
+query UsersConnection($first: Int = 1, $after: String) {
+  usersConnection(first: $first, after: $after) {
+    edges {
+      node {
+        id
+        name
+      }
+      cursor
+    }
+    pageInfo {
+      ...PageInfo
+    }
+  }
+}

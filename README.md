@@ -1,29 +1,27 @@
-# vue-user-auth
+# Something
 
-## Project setup
-```
-yarn install
-```
+## Setup
 
-### Compiles and hot-reloads for development
+### Required Packages
+
 ```
-yarn run serve
+yarn add vue-apollo graphql apollo-client apollo-link apollo-link-http apollo-link-ws subscriptions-transport-ws apollo-cache-inmemory graphql-tag apollo-utilities
 ```
 
-### Compiles and minifies for production
-```
-yarn run build
-```
+### Webpack GraphQL Loader
 
-### Run your tests
-```
-yarn run test
-```
+```javascript
+// vue.config.js
 
-### Lints and fixes files
+module.exports = {
+  chainWebpack: config => {
+    // GraphQL Loader
+    config.module
+      .rule('graphql')
+      .test(/\.(graphql|gql)$/)
+      .use('graphql-tag/loader')
+      .loader('graphql-tag/loader')
+      .end()
+  }
+}
 ```
-yarn run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
