@@ -5,6 +5,12 @@
       fetch-policy="cache-and-network"
     >
       <template slot-scope="{ result: { data, loading, error } }">
+        <p v-if="loading">Loading...</p>
+
+        <div v-else-if="error">
+          <p>An error occured while fetching the answers.</p>
+        </div>
+
         <template v-if="data && data.users && data.users.length">
           <p
             v-for="user of data.users"
@@ -28,7 +34,7 @@
 import USER_ADD_MUTATION from '../graphql/UserAdd.gql'
 import USER_REMOVE_MUTATION from '../graphql/UserRemove.gql'
 
-import { cacheUserAdd } from '../cache/users'
+import { cacheUserAdd, cacheUserRemove } from '../cache/users'
 
 export default {
   data() {
@@ -54,11 +60,13 @@ export default {
             cacheUserAdd(store, createUser)
           }
         })
-        .then(data => {
+        .then(() => {
+          //data => {
           // Result
           //console.log('success', data)
         })
-        .catch(error => {
+        .catch(() => {
+          //error => {
           // Error
           //console.error('error', error)
           // We restore the initial user input
@@ -67,24 +75,15 @@ export default {
     },
     UserRemove(id) {
       // Call to the graphql mutation
-      this.$apollo
-        .mutate({
-          mutation: USER_REMOVE_MUTATION,
-          variables: {
-            id
-          }
-          // update: (store, { data: { createUser } }) => {
-          //   cacheUserAdd(store, createUser)
-          // }
-        })
-        .then(data => {
-          // Result
-          console.log('success', data)
-        })
-        .catch(error => {
-          // Error
-          console.error('error', error)
-        })
+      this.$apollo.mutate({
+        mutation: USER_REMOVE_MUTATION,
+        variables: {
+          id
+        },
+        update: (store, { data: { deleteUser } }) => {
+          cacheUserRemove(store, deleteUser, id)
+        }
+      })
     }
   }
 }
