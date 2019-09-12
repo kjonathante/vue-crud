@@ -6,7 +6,13 @@
     >
       <template slot-scope="{ result: { data, loading, error } }">
         <template v-if="data && data.users && data.users.length">
-          <p v-for="user of data.users" v-bind:key="user.id">{{ user.name }}</p>
+          <p
+            v-for="user of data.users"
+            v-bind:key="user.id"
+            v-on:click="UserRemove(user.id)"
+          >
+            {{ user.name }}
+          </p>
         </template>
       </template>
     </ApolloQuery>
@@ -20,6 +26,8 @@
 
 <script>
 import USER_ADD_MUTATION from '../graphql/UserAdd.gql'
+import USER_REMOVE_MUTATION from '../graphql/UserRemove.gql'
+
 import { cacheUserAdd } from '../cache/users'
 
 export default {
@@ -55,6 +63,27 @@ export default {
           //console.error('error', error)
           // We restore the initial user input
           this.nameInput = nameInput
+        })
+    },
+    UserRemove(id) {
+      // Call to the graphql mutation
+      this.$apollo
+        .mutate({
+          mutation: USER_REMOVE_MUTATION,
+          variables: {
+            id
+          }
+          // update: (store, { data: { createUser } }) => {
+          //   cacheUserAdd(store, createUser)
+          // }
+        })
+        .then(data => {
+          // Result
+          console.log('success', data)
+        })
+        .catch(error => {
+          // Error
+          console.error('error', error)
         })
     }
   }

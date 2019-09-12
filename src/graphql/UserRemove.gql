@@ -1,0 +1,6 @@
+#import './UserFragment.gql'
+mutation deleteUser($id: ID!) {
+  deleteUser(where: { id: $id }) {
+    ...User
+  }
+}
