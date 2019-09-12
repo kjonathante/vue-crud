@@ -1,6 +1,9 @@
 <template>
   <div>
-    <ApolloQuery :query="require('../graphql/Users.gql')" fetch-policy="cache-and-network">
+    <ApolloQuery
+      :query="require('../graphql/Users.gql')"
+      fetch-policy="cache-and-network"
+    >
       <template slot-scope="{ result: { data, loading, error } }">
         <p v-if="loading">Loading...</p>
 
@@ -14,7 +17,8 @@
               v-for="user of data.users"
               v-bind:key="user.id"
               v-on:removeUser="UserRemove(user.id)"
-            >{{ user.name }}</Card>
+              >{{ user.name }}</Card
+            >
           </div>
         </template>
       </template>
