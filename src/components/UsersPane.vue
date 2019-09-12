@@ -1,7 +1,18 @@
 <template>
   <div>
-    <input type="text" v-model="nameInput" />
-    <button v-on:click="UserAdd">Add</button>
+    <ApolloQuery
+      :query="require('../graphql/Users.gql')"
+      fetch-policy="cache-and-network"
+    >
+      <template slot-scope="{ result: { data, loading, error } }">
+        {{ data }}
+      </template>
+    </ApolloQuery>
+
+    <div>
+      <input type="text" v-model="nameInput" />
+      <button v-on:click="UserAdd">Add</button>
+    </div>
   </div>
 </template>
 
