@@ -25,3 +25,18 @@ module.exports = {
   }
 }
 ```
+
+## Mutation
+
+### Add User
+
+#### Steps
+
+- create user add mutation graphql file
+- use Dollar Apollo Mutate
+- use update to add new user to cache which will propagate changes to all queries
+- use this snippets to determine if there are users
+
+```
+<template v-if="data && data.users && data.users.length">
+```

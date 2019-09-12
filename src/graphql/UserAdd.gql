@@ -1,0 +1,6 @@
+#import './UserFragment.gql'
+mutation createUser($name: String!) {
+  createUser(data: { name: $name }) {
+    ...User
+  }
+}
