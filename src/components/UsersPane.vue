@@ -44,13 +44,6 @@ export default {
           },
           update: (store, { data: { createUser } }) => {
             cacheUserAdd(store, createUser)
-            // cacheAnswerAdd(
-            //   store,
-            //   {
-            //     questionId: this.question.id
-            //   },
-            //   answerAdd
-            // )
           }
         })
         .then(data => {
