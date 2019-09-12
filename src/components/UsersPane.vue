@@ -12,13 +12,14 @@
         </div>
 
         <template v-if="data && data.users && data.users.length">
-          <p
-            v-for="user of data.users"
-            v-bind:key="user.id"
-            v-on:click="UserRemove(user.id)"
-          >
-            {{ user.name }}
-          </p>
+          <div class="flex-container">
+            <Card
+              v-for="user of data.users"
+              v-bind:key="user.id"
+              v-on:removeUser="UserRemove(user.id)"
+              >{{ user.name }}</Card
+            >
+          </div>
         </template>
       </template>
     </ApolloQuery>
@@ -31,12 +32,17 @@
 </template>
 
 <script>
+import Card from './Card'
 import USER_ADD_MUTATION from '../graphql/UserAdd.gql'
 import USER_REMOVE_MUTATION from '../graphql/UserRemove.gql'
 
 import { cacheUserAdd, cacheUserRemove } from '../cache/users'
 
 export default {
+  components: {
+    Card
+  },
+
   data() {
     return {
       nameInput: ''
@@ -88,5 +94,8 @@ export default {
   }
 }
 </script>
-
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.flex-container {
+  display: flex;
+}
+</style>
