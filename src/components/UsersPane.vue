@@ -20,6 +20,7 @@
 
 <script>
 import USER_ADD_MUTATION from '../graphql/UserAdd.gql'
+import { cacheUserAdd } from '../cache/users'
 
 export default {
   data() {
@@ -40,15 +41,25 @@ export default {
           mutation: USER_ADD_MUTATION,
           variables: {
             name: nameInput
+          },
+          update: (store, { data: { createUser } }) => {
+            cacheUserAdd(store, createUser)
+            // cacheAnswerAdd(
+            //   store,
+            //   {
+            //     questionId: this.question.id
+            //   },
+            //   answerAdd
+            // )
           }
         })
         .then(data => {
           // Result
-          console.log('success', data)
+          //console.log('success', data)
         })
         .catch(error => {
           // Error
-          console.error('error', error)
+          //console.error('error', error)
           // We restore the initial user input
           this.nameInput = nameInput
         })
