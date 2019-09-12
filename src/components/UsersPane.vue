@@ -5,7 +5,9 @@
       fetch-policy="cache-and-network"
     >
       <template slot-scope="{ result: { data, loading, error } }">
-        {{ data }}
+        <template v-if="data && data.users && data.users.length">
+          <p v-for="user of data.users" v-bind:key="user.id">{{ user.name }}</p>
+        </template>
       </template>
     </ApolloQuery>
 
