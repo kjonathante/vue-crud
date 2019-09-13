@@ -12,6 +12,9 @@
         :document="require('../graphql/UserRemoved.gql')"
         :update-query="onUserRemoved"
       />
+      <ApolloSubscribeToMore
+        :document="require('../graphql/UserUpdated.gql')"
+      />
       <template slot-scope="{ result: { data, loading, error } }">
         <p v-if="loading">Loading...</p>
 
