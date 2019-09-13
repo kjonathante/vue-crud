@@ -1,0 +1,8 @@
+subscription userRemoved {
+  user(where: { mutation_in: [DELETED] }) {
+    previousValues {
+      id
+      name
+    }
+  }
+}

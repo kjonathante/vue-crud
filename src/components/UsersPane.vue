@@ -8,6 +8,10 @@
         :document="require('../graphql/UserAdded.gql')"
         :update-query="onUserAdded"
       />
+      <ApolloSubscribeToMore
+        :document="require('../graphql/UserRemoved.gql')"
+        :update-query="onUserRemoved"
+      />
       <template slot-scope="{ result: { data, loading, error } }">
         <p v-if="loading">Loading...</p>
 
@@ -38,7 +42,11 @@
 import UserItem from './UserItem'
 import USER_ADD_MUTATION from '../graphql/UserAdd.gql'
 
-import { cacheUserAdd, cacheUserAddToList } from '../cache/users'
+import {
+  cacheUserAdd,
+  cacheUserAddToList,
+  cacheUserRemoveFromList
+} from '../cache/users'
 
 export default {
   components: {
@@ -86,6 +94,16 @@ export default {
         users: [...previousResult.users]
       }
       cacheUserAddToList(newResult.users, subscriptionData.data.user.node)
+      return newResult
+    },
+    onUserRemoved(previousResult, { subscriptionData }) {
+      const newResult = {
+        users: [...previousResult.users]
+      }
+      cacheUserRemoveFromList(
+        newResult.users,
+        subscriptionData.data.user.previousValues
+      )
       return newResult
     }
   }
