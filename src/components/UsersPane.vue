@@ -4,6 +4,10 @@
       :query="require('../graphql/Users.gql')"
       fetch-policy="cache-and-network"
     >
+      <ApolloSubscribeToMore
+        :document="require('../graphql/UserAdded.gql')"
+        :update-query="onUserAdded"
+      />
       <template slot-scope="{ result: { data, loading, error } }">
         <p v-if="loading">Loading...</p>
 
@@ -34,7 +38,7 @@
 import UserItem from './UserItem'
 import USER_ADD_MUTATION from '../graphql/UserAdd.gql'
 
-import { cacheUserAdd } from '../cache/users'
+import { cacheUserAdd, cacheUserAddToList } from '../cache/users'
 
 export default {
   components: {
@@ -76,6 +80,13 @@ export default {
           // We restore the initial user input
           this.nameInput = nameInput
         })
+    },
+    onUserAdded(previousResult, { subscriptionData }) {
+      const newResult = {
+        users: [...previousResult.users]
+      }
+      cacheUserAddToList(newResult.users, subscriptionData.data.user.node)
+      return newResult
     }
   }
 }
