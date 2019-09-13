@@ -80,8 +80,10 @@ export default {
   }
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .flex-container {
   display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
 }
 </style>

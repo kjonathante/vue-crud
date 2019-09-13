@@ -1,6 +1,8 @@
 <template>
   <div class="card">
-    <div>{{ user.name }}</div>
+    <div>
+      <p>{{ user.name }}</p>
+    </div>
     <div>
       <button v-on:click="userRemove">delete</button>
       <input type="text" v-model="nameInput" />
