@@ -1,0 +1,6 @@
+#import './UserFragment.gql'
+mutation updateUser($id: ID!, $name: String!) {
+  updateUser(data: { name: $name }, where: { id: $id }) {
+    ...User
+  }
+}

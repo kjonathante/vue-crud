@@ -13,12 +13,11 @@
 
         <template v-if="data && data.users && data.users.length">
           <div class="flex-container">
-            <Card
+            <UserItem
               v-for="user of data.users"
+              v-bind:user="user"
               v-bind:key="user.id"
-              v-on:removeUser="UserRemove(user.id)"
-              >{{ user.name }}</Card
-            >
+            />
           </div>
         </template>
       </template>
@@ -26,21 +25,20 @@
 
     <div>
       <input type="text" v-model="nameInput" />
-      <button v-on:click="UserAdd">Add</button>
+      <button v-on:click="userAdd">Add</button>
     </div>
   </div>
 </template>
 
 <script>
-import Card from './Card'
+import UserItem from './UserItem'
 import USER_ADD_MUTATION from '../graphql/UserAdd.gql'
-import USER_REMOVE_MUTATION from '../graphql/UserRemove.gql'
 
-import { cacheUserAdd, cacheUserRemove } from '../cache/users'
+import { cacheUserAdd } from '../cache/users'
 
 export default {
   components: {
-    Card
+    UserItem
   },
 
   data() {
@@ -50,7 +48,7 @@ export default {
   },
 
   methods: {
-    UserAdd() {
+    userAdd() {
       // We save the user input in case of an error
       const nameInput = this.nameInput
       // We clear it early to give the UI a snappy feel
@@ -78,18 +76,6 @@ export default {
           // We restore the initial user input
           this.nameInput = nameInput
         })
-    },
-    UserRemove(id) {
-      // Call to the graphql mutation
-      this.$apollo.mutate({
-        mutation: USER_REMOVE_MUTATION,
-        variables: {
-          id
-        },
-        update: (store, { data: { deleteUser } }) => {
-          cacheUserRemove(store, deleteUser, id)
-        }
-      })
     }
   }
 }
