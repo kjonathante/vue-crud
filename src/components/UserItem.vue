@@ -4,9 +4,11 @@
       <p>{{ user.name }}</p>
     </div>
     <div>
-      <button v-on:click="userRemove">delete</button>
+      <!-- <button>delete</button> -->
       <input type="text" v-model="nameInput" />
-      <button v-on:click="userUpdate">update</button>
+      <!-- <button >update</button> -->
+      <BaseButton icon="delete" class="icon-button" v-on:click="userRemove" />
+      <BaseButton icon="edit" class="icon-button" v-on:click="userUpdate" />
     </div>
   </div>
 </template>
@@ -17,7 +19,13 @@ import USER_UPDATE_MUTATION from '../graphql/UserUpdate.gql'
 
 import { cacheUserRemove } from '../cache/users'
 
+import BaseButton from './BaseButton'
+
 export default {
+  components: {
+    BaseButton
+  },
+
   props: {
     user: {
       type: Object,
@@ -82,5 +90,8 @@ export default {
   margin: 5px;
   width: 150px;
   height: 150px;
+}
+.icon-button {
+  margin: 5px;
 }
 </style>
