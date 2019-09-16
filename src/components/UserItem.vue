@@ -10,8 +10,16 @@
         <BaseButton icon="save" class="icon-button" v-on:click="userUpdate" />
       </div>
       <div v-show="!canEdit">
-        <BaseButton icon="delete" class="icon-button" v-on:click="userRemove" />
-        <BaseButton icon="edit" class="icon-button" v-on:click="toggleEdit" />
+        <BaseButton
+          icon="delete"
+          class="icon-button secondary"
+          v-on:click="userRemove"
+        />
+        <BaseButton
+          icon="edit"
+          class="icon-button secondary"
+          v-on:click="toggleEdit"
+        />
       </div>
     </div>
   </div>
@@ -98,15 +106,20 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-.card {
-  border: 1px solid grey;
-  padding: 10px;
-  margin: 5px;
-  width: 150px;
-  height: 150px;
-}
-.icon-button {
-  margin: 5px;
-}
+<style lang="stylus" scoped>
+@import '../styles/imports'
+
+.card
+  border 1px solid grey
+  padding 10px
+  margin 5px
+  width 150px
+  height 150px
+
+  p
+    ellipsis()
+    margin-bottom 16px
+
+.icon-button
+  margin 5px
 </style>
