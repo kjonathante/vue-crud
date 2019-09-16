@@ -1,5 +1,16 @@
 <template>
   <div>
+    <div class="add-user">
+      <label for="name-input">Create New User</label>
+      <input
+        type="text"
+        id="name-input"
+        v-model="nameInput"
+        placeholder="e.g. Kit Jonathan Te"
+        v-on:keyup.enter="userAdd"
+      />
+      <!-- <BaseButton v-on:click="userAdd">Add</BaseButton> -->
+    </div>
     <ApolloQuery
       :query="require('../graphql/Users.gql')"
       fetch-policy="cache-and-network"
@@ -33,16 +44,12 @@
         </template>
       </template>
     </ApolloQuery>
-
-    <div>
-      <input type="text" v-model="nameInput" />
-      <button v-on:click="userAdd">Add</button>
-    </div>
   </div>
 </template>
 
 <script>
 import UserItem from './UserItem'
+
 import USER_ADD_MUTATION from '../graphql/UserAdd.gql'
 
 import {
@@ -112,10 +119,16 @@ export default {
   }
 }
 </script>
-<style lang="scss">
-.flex-container {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-}
+<style lang="stylus" scoped>
+.flex-container
+  display flex
+  flex-wrap wrap
+  align-items flex-start
+
+.add-user
+  margin-bottom 10px
+
+  label
+    display inline-block
+    margin-bottom 5px
 </style>

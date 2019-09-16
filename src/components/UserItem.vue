@@ -4,9 +4,23 @@
       <p>{{ user.name }}</p>
     </div>
     <div>
-      <button v-on:click="userRemove">delete</button>
-      <input type="text" v-model="nameInput" />
-      <button v-on:click="userUpdate">update</button>
+      <div v-show="canEdit">
+        <input type="text" ref="nameinput" v-model="nameInput" />
+        <BaseButton icon="cancel" class="icon-button" v-on:click="toggleEdit" />
+        <BaseButton icon="save" class="icon-button" v-on:click="userUpdate" />
+      </div>
+      <div v-show="!canEdit">
+        <BaseButton
+          icon="delete"
+          class="icon-button secondary"
+          v-on:click="userRemove"
+        />
+        <BaseButton
+          icon="edit"
+          class="icon-button secondary"
+          v-on:click="toggleEdit"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -17,7 +31,13 @@ import USER_UPDATE_MUTATION from '../graphql/UserUpdate.gql'
 
 import { cacheUserRemove } from '../cache/users'
 
+import BaseButton from './BaseButton'
+
 export default {
+  components: {
+    BaseButton
+  },
+
   props: {
     user: {
       type: Object,
@@ -27,11 +47,21 @@ export default {
 
   data() {
     return {
-      nameInput: ''
+      nameInput: '',
+      canEdit: false
     }
   },
 
   methods: {
+    toggleEdit() {
+      this.canEdit = !this.canEdit
+      if (this.canEdit) {
+        this.$nextTick(function() {
+          this.$refs.nameinput.focus()
+        })
+      }
+    },
+
     userRemove() {
       // Call to the graphql mutation
       this.$apollo.mutate({
@@ -62,6 +92,7 @@ export default {
           // data => {
           // Result
           // console.log('success', data)
+          this.toggleEdit()
         })
         .catch(() => {
           // error => {
@@ -75,12 +106,20 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-.card {
-  border: 1px solid grey;
-  padding: 10px;
-  margin: 5px;
-  width: 150px;
-  height: 150px;
-}
+<style lang="stylus" scoped>
+@import '../styles/imports'
+
+.card
+  border 1px solid grey
+  padding 10px
+  margin 5px
+  width 150px
+  height 150px
+
+  p
+    ellipsis()
+    margin-bottom 16px
+
+.icon-button
+  margin 5px
 </style>
