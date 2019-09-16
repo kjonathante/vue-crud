@@ -4,11 +4,15 @@
       <p>{{ user.name }}</p>
     </div>
     <div>
-      <!-- <button>delete</button> -->
-      <input type="text" v-model="nameInput" />
-      <!-- <button >update</button> -->
-      <BaseButton icon="delete" class="icon-button" v-on:click="userRemove" />
-      <BaseButton icon="edit" class="icon-button" v-on:click="userUpdate" />
+      <div v-show="canEdit">
+        <input type="text" ref="nameinput" v-model="nameInput" />
+        <BaseButton icon="cancel" class="icon-button" v-on:click="toggleEdit" />
+        <BaseButton icon="save" class="icon-button" v-on:click="userUpdate" />
+      </div>
+      <div v-show="!canEdit">
+        <BaseButton icon="delete" class="icon-button" v-on:click="userRemove" />
+        <BaseButton icon="edit" class="icon-button" v-on:click="toggleEdit" />
+      </div>
     </div>
   </div>
 </template>
@@ -35,11 +39,21 @@ export default {
 
   data() {
     return {
-      nameInput: ''
+      nameInput: '',
+      canEdit: false
     }
   },
 
   methods: {
+    toggleEdit() {
+      this.canEdit = !this.canEdit
+      if (this.canEdit) {
+        this.$nextTick(function() {
+          this.$refs.nameinput.focus()
+        })
+      }
+    },
+
     userRemove() {
       // Call to the graphql mutation
       this.$apollo.mutate({
@@ -70,6 +84,7 @@ export default {
           // data => {
           // Result
           // console.log('success', data)
+          this.toggleEdit()
         })
         .catch(() => {
           // error => {
