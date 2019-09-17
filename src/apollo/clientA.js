@@ -1,13 +1,9 @@
-import Vue from 'vue'
-import VueApollo from 'vue-apollo'
 import { ApolloClient } from 'apollo-client'
 import { createHttpLink } from 'apollo-link-http'
 import { InMemoryCache } from 'apollo-cache-inmemory'
 import { split } from 'apollo-link'
 import { WebSocketLink } from 'apollo-link-ws'
 import { getMainDefinition } from 'apollo-utilities'
-
-Vue.use(VueApollo)
 
 // HTTP connection to the API
 const httpLink = createHttpLink({
@@ -48,8 +44,4 @@ const apolloClient = new ApolloClient({
   connectToDevTools: true
 })
 
-const apolloProvider = new VueApollo({
-  defaultClient: apolloClient
-})
-
-export { apolloProvider }
+export { apolloClient }
