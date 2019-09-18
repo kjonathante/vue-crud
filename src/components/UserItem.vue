@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card" v-on="$listeners">
     <div>
       <p>{{ user.name }}</p>
     </div>
@@ -38,10 +38,16 @@ export default {
     BaseButton
   },
 
+  inheritAttrs: false,
+
   props: {
     user: {
       type: Object,
       required: true
+    },
+    clientId: {
+      type: String,
+      required: false
     }
   },
 
@@ -66,6 +72,7 @@ export default {
       // Call to the graphql mutation
       this.$apollo.mutate({
         mutation: USER_REMOVE_MUTATION,
+        client: this.clientId,
         variables: {
           id: this.user.id
         },
@@ -83,6 +90,7 @@ export default {
       this.$apollo
         .mutate({
           mutation: USER_UPDATE_MUTATION,
+          client: this.clientId,
           variables: {
             id: this.user.id,
             name: nameInput
