@@ -1,6 +1,6 @@
 <template>
   <div>
-    {{ choosenUser }}
+    {{ selectedUser }}
     <div class="add-user">
       <label for="name-input">Create New User</label>
       <input
@@ -37,11 +37,16 @@
         <template v-if="data && data.users && data.users.length">
           <div class="flex-container">
             <UserItem
+              class="user"
               v-for="user of data.users"
               v-bind:user="user"
               v-bind:key="user.id"
               v-bind:clientId="$apollo.client"
-              v-on:click.self="handleUserClick(user.id)"
+              v-on:click.self="selectUser(user.id)"
+              v-bind:class="{
+                selected: selectedUser === user.id,
+                following: following[user.id]
+              }"
             />
           </div>
         </template>
@@ -54,6 +59,8 @@
 import UserItem from './UserItem'
 
 import USER_ADD_MUTATION from '../graphql/UserAdd.gql'
+import USER_FOLLOW_USER from '../graphql/UserFollowUser.gql'
+import USER_UNFOLLOW_USER from '../graphql/UserUnFollowUser.gql'
 
 import {
   cacheUserAdd,
@@ -73,7 +80,9 @@ export default {
   data() {
     return {
       nameInput: '',
-      choosenUser: ''
+      selectedUser: '',
+      following: {},
+      followers: {}
     }
   },
 
@@ -124,10 +133,44 @@ export default {
       )
       return newResult
     },
-    handleUserClick(id) {
-      console.log(!this.choosenUser)
-      if (!this.choosenUser) {
-        this.choosenUser = id
+    selectUser(id) {
+      if (!this.selectedUser) {
+        this.selectedUser = id
+      } else if (this.selectedUser === id) {
+        this.selectedUser = ''
+      } else {
+        this.$apollo
+          .mutate({
+            mutation: this.following[id]
+              ? USER_UNFOLLOW_USER
+              : USER_FOLLOW_USER,
+            variables: {
+              id: this.selectedUser,
+              follow: id
+            },
+            update: (store, { data }) => {
+              // cacheUserAdd(store, createUser)
+              console.log(data)
+            }
+          })
+          .then(data => {
+            // Result
+            // console.log('success', data)
+            const {
+              data: {
+                updateUser: { following }
+              }
+            } = data
+            this.following = {}
+            for (let i = 0; i < following.length; i++) {
+              this.$set(this.following, following[i].id, true)
+            }
+            console.log('success', this.following)
+          })
+          .catch(error => {
+            // Error
+            console.error('error', error)
+          })
       }
       console.log(id)
     }
@@ -139,6 +182,15 @@ export default {
   display flex
   flex-wrap wrap
   align-items flex-start
+
+  .user
+    cursor pointer
+
+  .selected
+    border 3px solid red
+
+  .following
+    border 3px solid green
 
 .add-user
   margin-bottom 10px

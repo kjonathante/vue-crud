@@ -1,0 +1,13 @@
+#import './UserFragment.gql'
+#import './UserFollowingFragment.gql'
+#import './UserFollowersFragment.gql'
+mutation updateUser($id: ID!, $follow: ID!) {
+  updateUser(
+    data: { following: { disconnect: { id: $follow } } }
+    where: { id: $id }
+  ) {
+    ...User
+    ...Following
+    ...Followers
+  }
+}

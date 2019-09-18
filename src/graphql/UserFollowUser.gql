@@ -1,0 +1,15 @@
+#import './UserFragment.gql'
+mutation updateUser($id: ID!, $follow: ID!) {
+  updateUser(
+    data: { following: { connect: { id: $follow } } }
+    where: { id: $id }
+  ) {
+    ...User
+    following {
+      ...User
+    }
+    followers {
+      ...User
+    }
+  }
+}

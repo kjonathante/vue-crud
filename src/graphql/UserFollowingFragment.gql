@@ -1,0 +1,6 @@
+#import './UserFragment.gql'
+fragment Following on User {
+  following {
+    ...User
+  }
+}
