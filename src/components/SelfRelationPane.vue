@@ -1,6 +1,47 @@
 <template>
   <div>
-    {{ selectedUser }}
+    <!-- <ApolloQuery
+      :query="require('../graphql/UserFollowingFollowers.gql')"
+      :variables="{ id: selectedUser }"
+      clientId="b"
+      fetch-policy="cache-and-network"
+    >
+      <template slot-scope="{ result: { data, loading, error } }">
+        <p v-if="loading">Loading...</p>
+
+        <div v-else-if="error">
+          <p>An error occured while fetching the answers.</p>
+        </div>
+
+        <template v-if="data && data.user">
+          <h2>{{ data.user.name }}</h2>
+          <div>
+            <h3>Following: {{ data.user.following.length }}</h3>
+            <div class="flex-container" v-if="data.user.following.length">
+              <UserItem
+                class="user"
+                v-for="user of data.user.following"
+                v-bind:user="user"
+                v-bind:key="user.id"
+                v-bind:clientId="$apollo.client"
+              />
+            </div>
+          </div>
+          <div>
+            <h3>Followers: {{ data.user.followers.length }}</h3>
+            <div class="flex-container" v-if="data.user.followers.length">
+              <UserItem
+                class="user"
+                v-for="user of data.user.followers"
+                v-bind:user="user"
+                v-bind:key="user.id"
+                v-bind:clientId="$apollo.client"
+              />
+            </div>
+          </div>
+        </template>
+      </template>
+    </ApolloQuery>-->
     <div class="add-user">
       <label for="name-input">Create New User</label>
       <input
@@ -45,7 +86,8 @@
               v-on:click.self="selectUser(user.id)"
               v-bind:class="{
                 selected: selectedUser === user.id,
-                following: following[user.id]
+                following: following[user.id],
+                followers: followers[user.id]
               }"
             />
           </div>
@@ -61,6 +103,7 @@ import UserItem from './UserItem'
 import USER_ADD_MUTATION from '../graphql/UserAdd.gql'
 import USER_FOLLOW_USER from '../graphql/UserFollowUser.gql'
 import USER_UNFOLLOW_USER from '../graphql/UserUnFollowUser.gql'
+import USER_QUERY from '../graphql/UserFollowingFollowers.gql'
 
 import {
   cacheUserAdd,
@@ -136,8 +179,41 @@ export default {
     selectUser(id) {
       if (!this.selectedUser) {
         this.selectedUser = id
+        this.$apollo
+          .query({
+            query: USER_QUERY,
+            variables: {
+              id: this.selectedUser
+            },
+            fetchPolicy: 'network-only'
+          })
+          .then(data => {
+            // Result
+            // console.log('success', data)
+            const {
+              data: {
+                user: { following, followers }
+              }
+            } = data
+            this.following = {}
+            for (let i = 0; i < following.length; i++) {
+              this.$set(this.following, following[i].id, true)
+            }
+            this.followers = {}
+            for (let i = 0; i < followers.length; i++) {
+              this.$set(this.followers, followers[i].id, true)
+            }
+            console.log('success', following)
+            console.log('success', followers)
+          })
+          .catch(error => {
+            // Error
+            console.error('error', error)
+          })
       } else if (this.selectedUser === id) {
         this.selectedUser = ''
+        this.following = {}
+        this.followers = {}
       } else {
         this.$apollo
           .mutate({
@@ -150,22 +226,29 @@ export default {
             },
             update: (store, { data }) => {
               // cacheUserAdd(store, createUser)
-              console.log(data)
-            }
+              // console.log(data)
+            },
+            fetchPolicy: 'no-cache'
           })
           .then(data => {
             // Result
             // console.log('success', data)
             const {
               data: {
-                updateUser: { following }
+                updateUser: { following, followers }
               }
             } = data
             this.following = {}
             for (let i = 0; i < following.length; i++) {
               this.$set(this.following, following[i].id, true)
             }
-            console.log('success', this.following)
+            this.followers = {}
+            for (let i = 0; i < followers.length; i++) {
+              this.$set(this.followers, followers[i].id, true)
+            }
+
+            console.log('success', following)
+            console.log('success', followers)
           })
           .catch(error => {
             // Error
@@ -190,7 +273,12 @@ export default {
     border 3px solid red
 
   .following
-    border 3px solid green
+    border-top 3px solid green
+    border-bottom @border-top
+
+  .followers
+    border-left 3px solid yellow
+    border-right @border-left
 
 .add-user
   margin-bottom 10px
