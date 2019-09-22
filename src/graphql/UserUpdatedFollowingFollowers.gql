@@ -1,0 +1,12 @@
+#import './UserFragment.gql'
+#import './UserFollowingFragment.gql'
+#import './UserFollowersFragment.gql'
+subscription userUpdated($id: ID!) {
+  user(where: { mutation_in: [UPDATED], node: { id: $id } }) {
+    node {
+      ...User
+      ...Following
+      ...Followers
+    }
+  }
+}
