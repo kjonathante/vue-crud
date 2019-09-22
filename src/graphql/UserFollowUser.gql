@@ -10,4 +10,7 @@ mutation updateUser($id: ID!, $follow: ID!) {
     ...Following
     ...Followers
   }
+  dummy: updateUser(data: { dummy: "dummy" }, where: { id: $follow }) {
+    id
+  }
 }

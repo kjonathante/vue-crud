@@ -1,47 +1,5 @@
 <template>
   <div>
-    <!-- <ApolloQuery
-      :query="require('../graphql/UserFollowingFollowers.gql')"
-      :variables="{ id: selectedUser }"
-      clientId="b"
-      fetch-policy="cache-and-network"
-    >
-      <template slot-scope="{ result: { data, loading, error } }">
-        <p v-if="loading">Loading...</p>
-
-        <div v-else-if="error">
-          <p>An error occured while fetching the answers.</p>
-        </div>
-
-        <template v-if="data && data.user">
-          <h2>{{ data.user.name }}</h2>
-          <div>
-            <h3>Following: {{ data.user.following.length }}</h3>
-            <div class="flex-container" v-if="data.user.following.length">
-              <UserItem
-                class="user"
-                v-for="user of data.user.following"
-                v-bind:user="user"
-                v-bind:key="user.id"
-                v-bind:clientId="$apollo.client"
-              />
-            </div>
-          </div>
-          <div>
-            <h3>Followers: {{ data.user.followers.length }}</h3>
-            <div class="flex-container" v-if="data.user.followers.length">
-              <UserItem
-                class="user"
-                v-for="user of data.user.followers"
-                v-bind:user="user"
-                v-bind:key="user.id"
-                v-bind:clientId="$apollo.client"
-              />
-            </div>
-          </div>
-        </template>
-      </template>
-    </ApolloQuery>-->
     <div class="add-user">
       <label for="name-input">Create New User</label>
       <input
@@ -90,6 +48,55 @@
                 followers: followers[user.id]
               }"
             />
+          </div>
+        </template>
+      </template>
+    </ApolloQuery>
+    <ApolloQuery
+      v-if="selectUser"
+      :query="require('../graphql/UserFollowingFollowers.gql')"
+      :variables="{ id: selectedUser }"
+      clientId="b"
+      fetch-policy="cache-and-network"
+    >
+      <ApolloSubscribeToMore
+        :document="require('../graphql/UserUpdatedFollowingFollowers.gql')"
+        :variables="{ id: selectedUser }"
+        :update-query="handleUpdate"
+      />
+
+      <template slot-scope="{ result: { data, loading, error } }">
+        <p v-if="loading">Loading...</p>
+
+        <div v-else-if="error">
+          <p>An error occured while fetching the answers.</p>
+        </div>
+
+        <template v-if="data && data.user">
+          <h2>{{ data.user.name }}</h2>
+          <div>
+            <h3>Following: {{ data.user.following.length }}</h3>
+            <div class="flex-container" v-if="data.user.following.length">
+              <UserItem
+                class="user"
+                v-for="user of data.user.following"
+                v-bind:user="user"
+                v-bind:key="user.id"
+                v-bind:clientId="$apollo.client"
+              />
+            </div>
+          </div>
+          <div>
+            <h3>Followers: {{ data.user.followers.length }}</h3>
+            <div class="flex-container" v-if="data.user.followers.length">
+              <UserItem
+                class="user"
+                v-for="user of data.user.followers"
+                v-bind:user="user"
+                v-bind:key="user.id"
+                v-bind:clientId="$apollo.client"
+              />
+            </div>
           </div>
         </template>
       </template>
@@ -176,6 +183,18 @@ export default {
       )
       return newResult
     },
+
+    helper({ following, followers }) {
+      this.following = {}
+      for (let i = 0; i < following.length; i++) {
+        this.$set(this.following, following[i].id, true)
+      }
+      this.followers = {}
+      for (let i = 0; i < followers.length; i++) {
+        this.$set(this.followers, followers[i].id, true)
+      }
+    },
+
     selectUser(id) {
       if (!this.selectedUser) {
         this.selectedUser = id
@@ -188,23 +207,7 @@ export default {
             fetchPolicy: 'network-only'
           })
           .then(data => {
-            // Result
-            // console.log('success', data)
-            const {
-              data: {
-                user: { following, followers }
-              }
-            } = data
-            this.following = {}
-            for (let i = 0; i < following.length; i++) {
-              this.$set(this.following, following[i].id, true)
-            }
-            this.followers = {}
-            for (let i = 0; i < followers.length; i++) {
-              this.$set(this.followers, followers[i].id, true)
-            }
-            console.log('success', following)
-            console.log('success', followers)
+            this.helper(data.data.user)
           })
           .catch(error => {
             // Error
@@ -224,38 +227,22 @@ export default {
               id: this.selectedUser,
               follow: id
             },
-            update: (store, { data }) => {
-              // cacheUserAdd(store, createUser)
-              // console.log(data)
-            },
             fetchPolicy: 'no-cache'
           })
           .then(data => {
-            // Result
-            // console.log('success', data)
-            const {
-              data: {
-                updateUser: { following, followers }
-              }
-            } = data
-            this.following = {}
-            for (let i = 0; i < following.length; i++) {
-              this.$set(this.following, following[i].id, true)
-            }
-            this.followers = {}
-            for (let i = 0; i < followers.length; i++) {
-              this.$set(this.followers, followers[i].id, true)
-            }
-
-            console.log('success', following)
-            console.log('success', followers)
+            this.helper(data.data.updateUser)
           })
           .catch(error => {
             // Error
             console.error('error', error)
           })
       }
-      console.log(id)
+      // console.log(id)
+    },
+
+    handleUpdate(user, { subscriptionData }) {
+      console.log(subscriptionData)
+      this.helper(subscriptionData.data.user.node)
     }
   }
 }
